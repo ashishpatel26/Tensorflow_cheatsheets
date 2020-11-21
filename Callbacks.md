@@ -38,3 +38,10 @@ The parameter `patience` specifies how many epochs to follow the best fit. To sa
 model.fit(train_data, epochs = 500, validation_data = validation_data,
           callbacks = [EarlyStopping(patience = 3, monitor = 'val_loss', restore_best_weights = True)])
 ```
+
+### CSV logger
+
+``` python3
+model.fit(train_data, epochs = 500, validation_data = validation_data,
+          callbacks = [CSVLogger('trainingLog.csv')])
+```
