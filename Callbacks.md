@@ -45,3 +45,45 @@ model.fit(train_data, epochs = 500, validation_data = validation_data,
 model.fit(train_data, epochs = 500, validation_data = validation_data,
           callbacks = [CSVLogger('trainingLog.csv')])
 ```
+
+
+
+### Custom callbacks
+
+Example: display batch number and time
+``` python3
+import datetime
+
+class MyCallback(tf.keras.callbacks.Callback):
+    def on_train_batch_begin(self, batch, logs = None):
+        print("Training begins: batch = {}, time = {}".format(batch, datetime.datetime.now().time()))
+    
+    def on_train_batch_end(self, batch, logs = None):
+        print("Training ends: batch = {}, time = {}".format(batch, datetime.datetime.now().time()))
+
+my_callback = MyCallback()
+model.fit(train_data, epochs = 500, validation_data = validation_data,
+          callbacks = [my_callback])
+```
+
+Example: early stopping after val_loss/train_loss goes beyond a specified threshold
+``` python3
+class MyCallback(tf.keras.callbacks.Callback):
+    def __init__(self, threshold):
+        super(MyCallback, self).__init__()
+        self.threshold = threshold
+    
+    def on_epoch_end(self, epoch, logs = None):
+        ratio = logs["val_loss"] / logs["loss"]
+        print("Epoch {}: ratio = {:.2f}".format(epoch, ratio))
+        
+        if ratio > self.threshold:
+            print("Ratio reached")
+            self.model.stop_training = True
+
+my_callback = MyCallback()
+model.fit(train_data, epochs = 500, validation_data = validation_data,
+          callbacks = [my_callback(threshold = 1.3)])
+```
+
+Callbacks can also be used to generate figures and save to disk (for examplem, when training GANs).
