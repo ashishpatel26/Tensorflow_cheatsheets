@@ -87,3 +87,28 @@ model.fit(train_data, epochs = 500, validation_data = validation_data,
 ```
 
 Callbacks can also be used to generate figures and save to disk (for examplem, when training GANs).
+
+To save the image at the end of each epoch, and save an animated gif at the end of training
+``` python3
+import imageio
+
+class MyCallback(tf.keras.callbacks.Callback):
+    def __init__(self, ...):
+        ...
+        self.images = []
+        ...
+    ...
+    def on_epoch_end(self, epoch, logs = None):
+        ...
+        buffer = io.BytesIO()
+        plt.savefig(buffer, format = 'png')
+        buffer.seek(0)
+        image = Image.open(buffer)
+        self.images.append(np.array(image))
+        
+        if epoch % self.print_every == 0:
+            plt.show()
+    
+    def on_train_end(self, logs = None):
+        imageio.mimsave('animation.gif', self.imiages, fps = 1)
+```
