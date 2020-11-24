@@ -25,3 +25,13 @@ with tf.GradientTape() as tape:
 grad = tape.gradient(z, x)
 
 ```
+
+The tape will be discarded once the `tape.gradient()` method was called. To call `tape.gradient()` multiple times, we can set `persistent = True`
+
+``` python3
+with tf.GradientTape(persistent = True) as tape:
+  ...
+grad1 = tape.gradient(..., ...)
+grad2 = tape.gradient(..., ...)
+del tape
+```
