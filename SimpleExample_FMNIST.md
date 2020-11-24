@@ -38,12 +38,16 @@ train = train_data.shuffle(buffer_size = 1024).batch(batch_size)
 test = test_data.batch(batch_size)
 ```
 
-### Step 3: Define Loss and Optimizer
+### Step 3: Define Loss, Optimizer, and Accuracy Metric
 
 ``` python3
 loss_object = tf.keras.losses.SparseCategoricalCrossentropy() # label is integers instead of one-hot vectors
 
 optimizer = tf.keras.optimizers.Adam()
+
+train_acc = tf.keras.metrics.SparseCategoricalAccuracy()
+
+val_acc = tf.keras.metrics.SparseCategoricalAccuracy()
 ```
 
 ### Step 4: Define Training Loop
@@ -62,9 +66,10 @@ def apply_gradient(optimizer, model, X, y):
         
 def train_data_for_one_epoch():
     loss_list = []
-    for i, (train_X, train_y) in enumerate(train_data):
-        logits, loss = apply_gradient(optimizer, model, train_X, train_y)
+    for train_X, train_y in train_data:
+        y_pred, loss = apply_gradient(optimizer, model, train_X, train_y)
         loss_list.append(loss)
+        train_acc.update_state(train_y, y_pred)
     return loss_list
 
 def model_validation():
@@ -85,6 +90,9 @@ for epoch in range(1, num_epochs+1):
     
     train_loss_mean = np.mean(train_loss)
     val_loss_mean = np.mean(val_loss)
+    
+    train_acc_val = train_acc.result()
+    train_acc.reset_states()
 ```
 
 ### Step 5:
