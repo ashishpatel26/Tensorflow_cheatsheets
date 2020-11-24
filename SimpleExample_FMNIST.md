@@ -45,9 +45,9 @@ loss_object = tf.keras.losses.SparseCategoricalCrossentropy() # label is integer
 
 optimizer = tf.keras.optimizers.Adam()
 
-train_acc = tf.keras.metrics.SparseCategoricalAccuracy()
+train_acc_metric = tf.keras.metrics.SparseCategoricalAccuracy()
 
-val_acc = tf.keras.metrics.SparseCategoricalAccuracy()
+val_acc_metric = tf.keras.metrics.SparseCategoricalAccuracy()
 ```
 
 ### Step 4: Define Training Loop
@@ -69,7 +69,7 @@ def train_data_for_one_epoch():
     for train_X, train_y in train_data:
         y_pred, loss = apply_gradient(optimizer, model, train_X, train_y)
         loss_list.append(loss)
-        train_acc.update_state(train_y, y_pred)
+        train_acc_metric.update_state(train_y, y_pred)
     return loss_list
 
 def model_validation():
@@ -78,6 +78,7 @@ def model_validation():
         y_pred = model(val_X)
         loss = loss_object(val_y, y_pred)
         loss_list.append(loss)
+        val_acc_metric.update_state(val_y, y_pred)
     return loss_list
 
 model = Model()
@@ -91,12 +92,9 @@ for epoch in range(1, num_epochs+1):
     train_loss_mean = np.mean(train_loss)
     val_loss_mean = np.mean(val_loss)
     
-    train_acc_val = train_acc.result()
-    train_acc.reset_states()
-```
-
-### Step 5:
-
-``` python3
-
+    train_acc = train_acc_metric.result()
+    train_acc_metric.reset_states()
+    
+    val_acc = val_acc_metric.result()
+    val_acc_metric.reset_states()
 ```
