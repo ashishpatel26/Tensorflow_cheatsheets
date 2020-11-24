@@ -60,7 +60,7 @@ def apply_gradient(optimizer, model, X, y):
         loss = loss_object(y, y_pred)
         
     gradients = tape.gradient(loss, model.trainable_weights)
-    optimizer.apply_gradients(zip(gradients, trainable_weights))
+    optimizer.apply_gradients(zip(gradients,  model.trainable_weights))
     
     return y_pred, loss
         
